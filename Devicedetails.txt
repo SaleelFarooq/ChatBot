@@ -1,0 +1,13 @@
+Intellivue
+MX1024
+13
+yes
+opt
+no
+opt
+7
+yes
+Intellivue
+MX124
+Intellivue
+MX1024
