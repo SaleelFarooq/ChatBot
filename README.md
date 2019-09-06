@@ -10,3 +10,9 @@ The API is documented using Swagger . In order to check the working of API
   2. add maven dependency for swagger in the 'pom.xml' file and update maven project
   3. run the project in eclipse IDE 
   4. access Swagger in web browser using this link : ""
+  
+  The gating thresholds that is being set are 
+    1. Number of compilation errors =0
+    2. Number of dupliactes for 3 lines = 0
+    3. Upper bound for cyclomatic complexity = 3
+    4. Coverage of Unit tests = 80 %
