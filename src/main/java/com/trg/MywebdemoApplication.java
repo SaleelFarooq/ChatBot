@@ -21,7 +21,6 @@ public class MywebdemoApplication {
 		 ChatBotDaoImpl dao1= ctx.getBean(ChatBotDaoImpl.class);
 		 dao1.refreshCustomerTable();
 		 ChatBot chatbot = ctx.getBean(ChatBot.class);
-		 chatbot.setUpSubscribers();
-		 
+		 chatbot.setUpSubscribers(); 
 	}
 }

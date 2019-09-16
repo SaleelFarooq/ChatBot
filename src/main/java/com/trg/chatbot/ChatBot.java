@@ -22,9 +22,11 @@ public class ChatBot{
 	}
 	
 
-	public String alertSubscribers(User user) {
+	public ResponseReturned alertSubscribers(User user) {
 		listOfSubscribers.get(0).saveDetails(user);
-		return "Your data have been passed to our Sales department";
+		ResponseReturned message = new ResponseReturned();
+		message.content = "Your data have been passed to our Sales department";
+		return message;
 	}
 
 	

@@ -5,8 +5,7 @@ import java.util.ArrayList;
 
 import java.util.List;
 
-
-
+import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
@@ -25,6 +24,7 @@ public class User {
      String address;
      List<String> responseSequence;
      String lastAskedQuestion="";
+     String productSeries="";
      private int n=0;
      private List<String> optionList=new ArrayList<String>();
      @Autowired
@@ -45,13 +45,19 @@ public class User {
      public void setCountOfQnToZero() {
     	 this.n=0;
     	 this.suggestion=productList.listAllPMS();
+    	response=productSeries;
      }
      
-     
+     public int printN() {
+    	 return this.n;
+   
+     }
    
      
-    public String askOnceAgain() throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException, SecurityException {
-    	return ("What you have entered is not a valid option\n"+this.lastAskedQuestion);
+    public ResponseReturned askOnceAgain() throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException, SecurityException, JSONException {
+    	ResponseReturned echoOfLastQuestion = new ResponseReturned();
+    	echoOfLastQuestion.content="What you have entered is not a valid option\n"+this.lastAskedQuestion;
+    	return echoOfLastQuestion;
     }
     
     private boolean checkIfResponseIsInvalid(String ans) {
@@ -65,7 +71,7 @@ public class User {
     		return this.optionList.get(Integer.parseInt(ans)-1);
     }
      
-     public String generateNextQuestion(String ans) throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException, SecurityException {
+     public ResponseReturned generateNextQuestion(String ans) throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException, SecurityException, JSONException {
     	 String question="";
     	 if(this.n!=0 && checkIfResponseIsInvalid(ans))
 			 {return askOnceAgain();
@@ -73,15 +79,21 @@ public class User {
     	 this.response=setResponse(ans);
     	 this.suggestion=userAssister.setUpSuggestions(this.suggestion,this.response,this.n);
    
-    	 if(userAssister.BypassQuestions(this.n))
-    		 	return "I have arrived at a suggestion for you";
+    	 if(userAssister.BypassQuestions(this.n)) {
+    		 ResponseReturned concludingMessage = new ResponseReturned();
+    		 concludingMessage.content="I have arrived at a suggestion for you";
+    		 return concludingMessage;
+    	 }
+    		 	
     
     	 this.optionList=userAssister.setUpOptionList(this.suggestion,this.n);
     	 
     	 question=userAssister.fn(this.suggestion,this.optionList,this.n);
     	 this.n++;
     	 this.lastAskedQuestion=question;
-    	 return question;
+    	 ResponseReturned qnAsObject = new ResponseReturned();
+    	qnAsObject.content=question;
+    	 return qnAsObject;
      }
      
      
@@ -101,14 +113,14 @@ public class User {
     	 return result;
      }
      
-     public String suggest() {
-    	 String suggestion="";
+     public ResponseReturned suggest() {
+    	 ResponseReturned suggestion=new ResponseReturned();
     	 if(this.suggestion.size()==1)
-    		 	suggestion="The product that is suitable for you is \n";
+    		 	suggestion.content="The product that is suitable for you is \n";
     	 else
-    		 suggestion="Our products those will suit your recquirements are \n";
+    		 suggestion.content="Our products those will suit your recquirements are \n";
     	 for(int i=0;i<this.suggestion.size();i++)
-    		 suggestion+=this.suggestion.get(i).type.toUpperCase()+" "+this.suggestion.get(i).model+"\n";
+    		 suggestion.content+=this.suggestion.get(i).type.toUpperCase()+" "+this.suggestion.get(i).model+"\n";
     	 this.n=5;
     	 optionList=getYesORNoList();
     	 return (suggestion);
@@ -121,9 +133,15 @@ public class User {
     	 this.acuity=decideAcuity(location,nofbeds);
      	 this.suggestion=productList.listAllPMS();
    	    if(this.acuity.equals("low"))
-   	    	response="Efficia";
+   	    	{
+   	    	productSeries="Efficia";
+   	    	response=productSeries;
+   	    	}
+   	    	
    	    else
-   	    	response="Intellivue";
+   	    	{productSeries="Intellivue";
+	    	response=productSeries;
+   	    	}
    	    seUpUserAssister(this.acuity);
      }
      

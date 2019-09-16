@@ -2,6 +2,9 @@ package com.trg.chatbot;
 
 
 
+
+import org.json.JSONException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -14,57 +17,73 @@ public class Controller {
 	@Autowired
 	PmsService pmsService;
 	
+	@GetMapping(value = "/ask" ,produces = "application/json")
+	public ResponseReturned askQuestions(@RequestParam(name="answer",required = false) String ans) throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException, SecurityException, JSONException  {
+	chatbot.user.setCountOfQnToZero();
+	if(ans==null)	
+		{
+		return chatbot.user.generateNextQuestion(ans);}
+	else 
+		{String[] arrOfStr = ans.split(","); 
+		ResponseReturned qn;
+		qn=chatbot.user.generateNextQuestion("");
+		for(int i=0;i<arrOfStr.length;i++)
+				{
+				qn=chatbot.user.generateNextQuestion(arrOfStr[i]);
+				}
+		Logger.log("-->"+qn.content.toString());
+		return qn;	
+		}
+		}
 	
 	
-	@GetMapping("/asknextquestion")
-	public String askNextQuestion(@RequestParam(name="answer",required = false) String ans) throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException, SecurityException  {
-	return chatbot.user.generateNextQuestion(ans);
-	}
 	
 	
-	
-	@GetMapping("/suggest")
-	public String showSuggestedProducts() {
+	@GetMapping(value = "/suggest" , produces = "application/json")
+	public  ResponseReturned showSuggestedProducts() {
 		return chatbot.user.suggest();
 	}
 	
-	@GetMapping("/getdetails")
-	public String getDetails(@RequestParam("name") String name,@RequestParam("location") String location,@RequestParam("beds") String beds) throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException, SecurityException {
+	@GetMapping(value = "/getdetails", produces = "application/json")
+	public ResponseReturned getDetails(@RequestParam("name") String name,@RequestParam("location") String location,@RequestParam("beds") String beds) throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException, SecurityException, JSONException {
 		chatbot.user.populateUserDetails(name, location, beds);
-		return "Hi "+name+ " , click on continue to chat..";
+		ResponseReturned welcomeMessage = new ResponseReturned();
+		welcomeMessage.content="Hi "+name+ " , click on continue to chat..";
+		 return welcomeMessage;
 	}
 	
-	@GetMapping("/getfurtherdetails")
-	public String getFurtherDetails(@RequestParam("email") String email,@RequestParam("phone") String phone,@RequestParam("shippingaddress") String shippingAddress,
+	@GetMapping(value = "/getfurtherdetails" , produces = "application/json")
+	public ResponseReturned getFurtherDetails(@RequestParam("email") String email,@RequestParam("phone") String phone,@RequestParam("shippingaddress") String shippingAddress,
 			@RequestParam("centralPMS") String centralPMS,@RequestParam(name="additionalParameters" ,defaultValue = "") String additionalParams) {
 		chatbot.user.populateFurtherDetails(email,phone,shippingAddress,centralPMS,additionalParams);
 		return chatbot.alertSubscribers(chatbot.user);
 	}
 	
-	@GetMapping("/alertsubscribers")
-	public String alertSubscribers() {
-		chatbot.alertSubscribers(chatbot.user);
-		return "Subscribers are alerted";
-	}
+
 	
-	@GetMapping("/addnewdevice")
-	 public String  addNewdevice(@RequestParam("type") String type,@RequestParam("model") String model,
+	@GetMapping(value = "/addnewdevice" , produces = "application/json")
+	 public ResponseReturned  addNewdevice(@RequestParam("type") String type,@RequestParam("model") String model,
 			 @RequestParam("screensize") String screensize,@RequestParam("touch") String touch,@RequestParam("masimorainbow") String masimoRainbow,
 			 @RequestParam("spO2") String spo2,@RequestParam("cardiacoutput") String cardiacOutput) {
 			int status = pmsService.addNewPms(type,model,screensize,touch,masimoRainbow,spo2,cardiacOutput);
+			ResponseReturned message = new ResponseReturned();
 			if(status>0)
-					{return ("PMS added succesfully");}
+					{message.content="PMS added succesfully";
+					}
 			else
-					{return ("Something happened , try again..");}
+					{message.content="Something happened , try again..";}
+			return message;
 	}
 	
-	@GetMapping("/removedevice")
-	public String deleteDevice(@RequestParam("type") String type,@RequestParam("model") String model) {
+	@GetMapping(value = "/removedevice" , produces = "application/json")
+	public ResponseReturned deleteDevice(@RequestParam("type") String type,@RequestParam("model") String model) {
+		ResponseReturned message = new ResponseReturned();
 		int status = pmsService.deleteDevice(type,model);
 		if(status==1)
-				{return ("Deleted successfully");}
+				{message.content="Deleted successfully";}
 		else
-				{return ("try deleting once again");}
+				{message.content="try deleting once again";}
+		return message;
 	}
 	
 }
