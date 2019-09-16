@@ -3,7 +3,6 @@ package com.trg.chatbot;
 
 
 
-import org.json.JSONException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,23 +17,23 @@ public class Controller {
 	PmsService pmsService;
 	
 	@GetMapping(value = "/ask" ,produces = "application/json")
-	public ResponseReturned askQuestions(@RequestParam(name="answer",required = false) String ans) throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException, SecurityException, JSONException  {
+	public ResponseReturned askQuestions(@RequestParam(name="answer",required = false) String ans)  {
 	chatbot.user.setCountOfQnToZero();
-	if(ans==null)	
-		{
-		return chatbot.user.generateNextQuestion(ans);}
-	else 
-		{String[] arrOfStr = ans.split(","); 
-		ResponseReturned qn;
-		qn=chatbot.user.generateNextQuestion("");
-		for(int i=0;i<arrOfStr.length;i++)
+	ResponseReturned qn;
+		if(ans==null)	
 				{
-				qn=chatbot.user.generateNextQuestion(arrOfStr[i]);
+				qn=chatbot.user.generateNextQuestion(ans);}
+			else 
+				{String[] arrOfStr = ans.split(","); 
+				qn=chatbot.user.generateNextQuestion("");
+				for(int i=0;i<arrOfStr.length;i++)
+						{
+						qn=chatbot.user.generateNextQuestion(arrOfStr[i]);
+						}
 				}
-		Logger.log("-->"+qn.content.toString());
 		return qn;	
 		}
-		}
+		
 	
 	
 	
@@ -45,8 +44,12 @@ public class Controller {
 	}
 	
 	@GetMapping(value = "/getdetails", produces = "application/json")
-	public ResponseReturned getDetails(@RequestParam("name") String name,@RequestParam("location") String location,@RequestParam("beds") String beds) throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException, SecurityException, JSONException {
-		chatbot.user.populateUserDetails(name, location, beds);
+	public ResponseReturned getDetails(@RequestParam("name") String name,@RequestParam("location") String location,@RequestParam("beds") String beds) {
+		try {
+			chatbot.user.populateUserDetails(name, location, beds);
+		} catch (IllegalArgumentException | SecurityException e) {
+			Logger.log("Exceptions");
+		}
 		ResponseReturned welcomeMessage = new ResponseReturned();
 		welcomeMessage.content="Hi "+name+ " , click on continue to chat..";
 		 return welcomeMessage;

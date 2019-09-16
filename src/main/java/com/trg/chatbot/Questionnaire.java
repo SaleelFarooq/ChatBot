@@ -11,7 +11,7 @@ import java.util.Set;
 import org.springframework.stereotype.Component;
 @Component
 public class Questionnaire {
-	public  Map<String,String> mapOfProperties=new HashMap<>();
+	  Map<String,String> mapOfProperties=new HashMap<>();
 	
 	public  String getPropertyBeingAsked(int n) {
 		String key=String.valueOf(n);
@@ -28,16 +28,25 @@ public class Questionnaire {
 		return question.toString();
 	}
 	
-	public String provideNextQuestion(List<String> availableOptions,String propertyBeingAsked) throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException, SecurityException {
+	public String provideNextQuestion(List<String> availableOptions,String propertyBeingAsked)  {
 		return generateQuestionFromOptions(availableOptions,propertyBeingAsked);
 	}
 	
-	public List<String> setOptionList(List<Pms> availabList,String property) throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException, SecurityException {
- 		Field fld =  Pms.class.getDeclaredField(property);
+	public List<String> setOptionList(List<Pms> availabList,String property)  {
+ 		Field fld = null;
+		try {
+			fld = Pms.class.getDeclaredField(property);
+		} catch (NoSuchFieldException | SecurityException e) {
+			Logger.log("Exceptions happened");
+		}
  		Set<String> setOfOptions= new HashSet<>();
  		List<String> result=new ArrayList<>();
  		for(int i=0;i<availabList.size();i++)
- 				{setOfOptions.add((String )fld.get(availabList.get(i)));
+ 				{try {
+					setOfOptions.add((String )fld.get(availabList.get(i)));
+				} catch (IllegalArgumentException | IllegalAccessException e) {
+					Logger.log("Exceptions happened");
+				}
  				}
  		for(String item : setOfOptions)
  			result.add(item);

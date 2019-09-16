@@ -6,7 +6,7 @@ import java.util.List;
 import org.springframework.stereotype.Component;
 @Component
 public class QuestionnaireForLowAcuity extends Questionnaire{
-	public static final String[] PARAM_ARRAY = {"philipsSpo2","cardiacoutput","masimorainbow"};
+	protected static final String[] PARAM_ARRAY = {"philipsSpo2","cardiacoutput","masimorainbow"};
 	private int[] flagArray= {0,0,0};
 	public QuestionnaireForLowAcuity() {
 		mapOfProperties.put("0","type");
@@ -33,13 +33,21 @@ public class QuestionnaireForLowAcuity extends Questionnaire{
 		return optionList;
 	}
 	
-	public List<Pms> setSuggestionBasedOnParameters(List<Pms> availableProducts,String response) throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException, SecurityException{
+	public List<Pms> setSuggestionBasedOnParameters(List<Pms> availableProducts,String response) {
 		List<Pms> result=new ArrayList<>();
 		setFlags(response);
 		for(int i=0;i<flagArray.length;i++)
 				{if(flagArray[i]==1)
-						{result=Utility.narrowDownSuggestions(availableProducts,PARAM_ARRAY[i],"yes");
-						result.addAll(Utility.narrowDownSuggestions(availableProducts,PARAM_ARRAY[i],"opt"));}
+						{try {
+							result=Utility.narrowDownSuggestions(availableProducts,PARAM_ARRAY[i],"yes");
+						} catch (IllegalArgumentException | SecurityException e) {
+							Logger.log("Exception happened");
+						}
+						try {
+							result.addAll(Utility.narrowDownSuggestions(availableProducts,PARAM_ARRAY[i],"opt"));
+						} catch (IllegalArgumentException | SecurityException e) {
+							Logger.log("Exception happened");
+						}}
 				}
 		return result;
 	}

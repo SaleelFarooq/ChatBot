@@ -17,12 +17,17 @@ public class Utility {
 		  }  
 		}
 
-	public static List<Pms> narrowDownSuggestions(List<Pms> list1,String property,String valueOfProperty) throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException, SecurityException {
+	public static List<Pms> narrowDownSuggestions(List<Pms> list1,String property,String valueOfProperty) {
     	 List<Pms> result = new ArrayList<>();
  		int lengthOfList=list1.size();
  		for(int i=0;i<lengthOfList;i++)
- 					{if((Pms.class.getDeclaredField(property).get(list1.get(i))).equals(valueOfProperty))
- 							result.add(list1.get(i));
+ 					{try {
+						if((Pms.class.getDeclaredField(property).get(list1.get(i))).equals(valueOfProperty))
+								result.add(list1.get(i));
+					} catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException
+							| SecurityException e) {
+						Logger.log("Exceptions happened");
+					}
  					}
  		return result;
      }

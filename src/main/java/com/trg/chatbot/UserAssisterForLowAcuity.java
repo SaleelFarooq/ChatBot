@@ -10,7 +10,7 @@ public class UserAssisterForLowAcuity implements UserAssister{
 	 
 	
 	@Override
-	public List<Pms> setUpSuggestions(List<Pms> existingSuggestion, String currentResponse, int countOfQuestion) throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException, SecurityException {
+	public List<Pms> setUpSuggestions(List<Pms> existingSuggestion, String currentResponse, int countOfQuestion) {
 		 if(countOfQuestion==1) {
 			 return questionnaire.setSuggestionBasedOnParameters(existingSuggestion, currentResponse);
 		 }
@@ -20,12 +20,12 @@ public class UserAssisterForLowAcuity implements UserAssister{
 	}
 
 	@Override
-	public boolean BypassQuestions(int n) {
+	public boolean byPassQuestions(int n) {
 		return (n==3);
 	}
 
 	@Override
-	public List<String> setUpOptionList(List<Pms> existingSuggestion, int countOfQuestion) throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException, SecurityException {
+	public List<String> setUpOptionList(List<Pms> existingSuggestion, int countOfQuestion) {
 		if(countOfQuestion==0)
 			{return questionnaire.setOptionsForParameters();
 			}
@@ -35,7 +35,7 @@ public class UserAssisterForLowAcuity implements UserAssister{
 	}
 
 	@Override
-	public String fn(List<Pms> existingSuggestion,List<String> optionList,int countOfQuestion) throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException, SecurityException {
+	public String fn(List<Pms> existingSuggestion,List<String> optionList,int countOfQuestion) {
 		return questionnaire.provideNextQuestion(optionList,questionnaire.getPropertyBeingAsked(countOfQuestion+1));
 	}
 

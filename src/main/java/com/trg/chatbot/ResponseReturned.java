@@ -1,7 +1,7 @@
 package com.trg.chatbot;
 
 public class ResponseReturned {
-	public String content;
+	 String content;
 
 	public String getContent() {
 		return content;

@@ -1,5 +1,6 @@
 package com.trg.chatbot;
 
+import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Component;
 @Component
@@ -10,25 +11,30 @@ public class UserAssisterForHighAcuity implements UserAssister{
 	
 	
 	@Override
-	public List<Pms> setUpSuggestions(List<Pms> existingSuggestion, String currentResponse, int countOfQuestion) throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException, SecurityException {
-		return Utility.narrowDownSuggestions(existingSuggestion,questionnaire.getPropertyBeingAsked(countOfQuestion),currentResponse); 
+	public List<Pms> setUpSuggestions(List<Pms> existingSuggestion, String currentResponse, int countOfQuestion)  {
+		List<Pms> result = new ArrayList<>();
+		try {
+			result=Utility.narrowDownSuggestions(existingSuggestion,questionnaire.getPropertyBeingAsked(countOfQuestion),currentResponse);
+		} catch (IllegalArgumentException | SecurityException e) {
+			Logger.log("Exceptions");
+		} 
+		return result;
 	}
 
 	@Override
-	public boolean BypassQuestions(int n) {
+	public boolean byPassQuestions(int n) {
 		return (n==2); 
 	}
 
 	@Override
-	public List<String> setUpOptionList(List<Pms> existingSuggestion, int countOfQuestion) throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException, SecurityException {
+	public List<String> setUpOptionList(List<Pms> existingSuggestion, int countOfQuestion) {
 		return questionnaire.setOptionList(existingSuggestion,questionnaire.getPropertyBeingAsked(countOfQuestion+1)); 
 	}
 
 	
 
 	@Override
-	public String fn(List<Pms> existingSuggestion, List<String> optionList, int countOfQuestion)
-			throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException, SecurityException {
+	public String fn(List<Pms> existingSuggestion, List<String> optionList, int countOfQuestion) {
 		 return questionnaire.provideNextQuestion(optionList,questionnaire.getPropertyBeingAsked(countOfQuestion+1));
 	}
 

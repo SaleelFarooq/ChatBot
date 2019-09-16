@@ -5,7 +5,6 @@ import java.util.ArrayList;
 
 import java.util.List;
 
-import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
@@ -26,7 +25,7 @@ public class User {
      String lastAskedQuestion="";
      String productSeries="";
      private int n=0;
-     private List<String> optionList=new ArrayList<String>();
+     private List<String> optionList=new ArrayList<>();
      @Autowired
      ProductList productList;
      
@@ -54,7 +53,7 @@ public class User {
      }
    
      
-    public ResponseReturned askOnceAgain() throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException, SecurityException, JSONException {
+    public ResponseReturned askOnceAgain()  {
     	ResponseReturned echoOfLastQuestion = new ResponseReturned();
     	echoOfLastQuestion.content="What you have entered is not a valid option\n"+this.lastAskedQuestion;
     	return echoOfLastQuestion;
@@ -71,24 +70,36 @@ public class User {
     		return this.optionList.get(Integer.parseInt(ans)-1);
     }
      
-     public ResponseReturned generateNextQuestion(String ans) throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException, SecurityException, JSONException {
+     public ResponseReturned generateNextQuestion(String ans)  {
     	 String question="";
     	 if(this.n!=0 && checkIfResponseIsInvalid(ans))
 			 {return askOnceAgain();
 			 }
     	 this.response=setResponse(ans);
-    	 this.suggestion=userAssister.setUpSuggestions(this.suggestion,this.response,this.n);
+    	 try {
+			this.suggestion=userAssister.setUpSuggestions(this.suggestion,this.response,this.n);
+		} catch (IllegalArgumentException | SecurityException e) {
+			Logger.log("Exceptions   happened");
+		}
    
-    	 if(userAssister.BypassQuestions(this.n)) {
+    	 if(userAssister.byPassQuestions(this.n)) {
     		 ResponseReturned concludingMessage = new ResponseReturned();
     		 concludingMessage.content="I have arrived at a suggestion for you";
     		 return concludingMessage;
     	 }
     		 	
     
-    	 this.optionList=userAssister.setUpOptionList(this.suggestion,this.n);
+    	 try {
+			this.optionList=userAssister.setUpOptionList(this.suggestion,this.n);
+		} catch (IllegalArgumentException | SecurityException e) {
+			Logger.log("Exceptions  happened");
+		}
     	 
-    	 question=userAssister.fn(this.suggestion,this.optionList,this.n);
+    	 try {
+			question=userAssister.fn(this.suggestion,this.optionList,this.n);
+		} catch (IllegalArgumentException | SecurityException e) {
+			Logger.log("Exceptions happened");
+		}
     	 this.n++;
     	 this.lastAskedQuestion=question;
     	 ResponseReturned qnAsObject = new ResponseReturned();
@@ -114,19 +125,21 @@ public class User {
      }
      
      public ResponseReturned suggest() {
-    	 ResponseReturned suggestion=new ResponseReturned();
+    	 ResponseReturned suggestionObj=new ResponseReturned();
+    	 StringBuilder message = new StringBuilder();
     	 if(this.suggestion.size()==1)
-    		 	suggestion.content="The product that is suitable for you is \n";
+    		 	message.append("The product that is suitable for you is \n");
     	 else
-    		 suggestion.content="Our products those will suit your recquirements are \n";
+    		 message.append("Our products those will suit your recquirements are \n");
     	 for(int i=0;i<this.suggestion.size();i++)
-    		 suggestion.content+=this.suggestion.get(i).type.toUpperCase()+" "+this.suggestion.get(i).model+"\n";
+    		 message.append(this.suggestion.get(i).type.toUpperCase()+" "+this.suggestion.get(i).model+"\n");
     	 this.n=5;
+    	 suggestionObj.content=message.toString();
     	 optionList=getYesORNoList();
-    	 return (suggestion);
+    	 return (suggestionObj);
      }
      
-     public void populateUserDetails(String name,String location,String beds) throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException, SecurityException {
+     public void populateUserDetails(String name,String location,String beds)  {
     	 this.name=name;
     	 this.location=location;
     	 this.nofbeds=Integer.parseInt(beds);
